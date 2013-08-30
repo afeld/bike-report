@@ -53,13 +53,22 @@ stations['results'].each do |station|
     end
     json = JSON.parse(response.body)[0]
     if json
-      json['datapoints'].each do |datapoint|
-        availability_row = [
-          station['id'],
-          datapoint[1],
-          datapoint[0]
-        ]
-        db.execute("INSERT INTO #{table} (station_id, time, count) VALUES (?, ?, ?)", availability_row)
+      # sqlite doesnt seem to like adding too many values at once
+      json['datapoints'].each_slice(500).each do |datapoints|
+        values = datapoints.map { |datapoint|
+          value = [
+            station['id'],
+            datapoint[1],
+            datapoint[0]
+          ]
+          if value.any?(&:nil?)
+            nil
+          else
+            "(#{value.join(', ')})"
+          end
+        }.compact.join(', ')
+
+        db.execute("INSERT INTO #{table} (station_id, time, count) VALUES #{values}")
       end
       print '.'
     else
