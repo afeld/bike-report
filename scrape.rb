@@ -12,29 +12,25 @@ db = SQLite3::Database.new('data.db')
 
 db.default_synchronous = 'OFF'
 
-db.execute <<-SQL
-  create table stations (
-    id int,
-    status varchar(30),
-    latitude float,
-    longitude float,
-    label varchar(30)
+db.execute_batch <<-SQL
+  CREATE TABLE stations (
+    id INTEGER PRIMARY KEY,
+    status VARCHAR(30),
+    latitude FLOAT,
+    longitude FLOAT,
+    label VARCHAR(30) NOT NULL
   );
-SQL
 
-db.execute <<-SQL
-  create table available_bikes (
-    station_id int,
-    time int,
-    count int
+  CREATE TABLE available_bikes (
+    station_id INTEGER NOT NULL,
+    time INTEGER NOT NULL,
+    count INTEGER NOT NULL
   );
-SQL
 
-db.execute <<-SQL
-  create table available_docks (
-    station_id int,
-    time int,
-    count int
+  CREATE TABLE available_docks (
+    station_id INTEGER NOT NULL,
+    time INTEGER NOT NULL,
+    count INTEGER NOT NULL
   );
 SQL
 
