@@ -10,6 +10,7 @@ require 'sqlite3'
 `rm -f data.db`
 db = SQLite3::Database.new('data.db')
 
+# http://www.sqlite.org/faq.html#q19
 db.default_synchronous = 'OFF'
 
 db.execute_batch <<-SQL
