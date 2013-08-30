@@ -1,9 +1,16 @@
 require 'rubygems'
 require 'bundler'
-Bundler.require(:default)
+Bundler.setup(:default)
+
+require 'citibikenyc'
+require 'faraday'
+require 'sqlite3'
+
 
 `rm -f data.db`
 db = SQLite3::Database.new('data.db')
+
+db.default_synchronous = 'OFF'
 
 db.execute <<-SQL
   create table stations (
@@ -66,15 +73,17 @@ stations['results'].each do |station|
         else
           "(#{value.join(', ')})"
         end
-      }.compact.join(', ')
+      }.compact
 
-      table = json['target'].split('.').last
-      statement = "INSERT INTO #{table} (station_id, time, count) VALUES #{values}"
-      begin
-        db.execute(statement)
-      rescue => e
-        puts statement
-        raise e
+      unless values.empty?
+        table = json['target'].split('.').last
+        statement = "INSERT INTO #{table} (station_id, time, count) VALUES #{values.join(', ')}"
+        begin
+          db.execute(statement)
+        rescue => e
+          puts statement
+          raise e
+        end
       end
     end
   end
