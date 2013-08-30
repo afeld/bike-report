@@ -10,4 +10,4 @@ rows = db.execute <<-SQL
   SELECT (SELECT COUNT() FROM available_bikes WHERE count < 3) * 100.0 / (SELECT COUNT() FROM available_bikes);
 SQL
 
-puts "stations are near-empty #{rows[0][0].round(2)}% of the time"
+puts "stations are near-empty #{rows[0][0].round(1)}% of the time"

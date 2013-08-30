@@ -4,9 +4,9 @@ Bundler.setup(:default)
 
 require 'sqlite3'
 
-db = SQLite3::Database.new('data1.db')
+db = SQLite3::Database.new('data.db')
 
-puts "FREQUENTLY EMPTY STATIONS"
+puts "FREQUENTLY EMPTY STATIONS (PERCENT OF RECORDED TIMES)"
 
 # thanks to https://twitter.com/Bipsterite for the query
 rows = db.execute <<-SQL

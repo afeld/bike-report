@@ -1,6 +1,6 @@
 # NYC CitiBike Availability Data Scraper
 
-## Usage
+Setup:
 
 ```bash
 bundle
@@ -8,6 +8,12 @@ bundle exec ruby scrape.rb
 ```
 
 The data will then be loaded into a [SQLite3](http://www.sqlite.org/) database, `data.db`.  You can explore it with `sqlite3 data.db`.
+
+To run a particular report:
+
+```bash
+bundle exec ruby reports/REPORT_NAME.rb
+```
 
 ## Resources
 
