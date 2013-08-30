@@ -68,7 +68,13 @@ stations['results'].each do |station|
           end
         }.compact.join(', ')
 
-        db.execute("INSERT INTO #{table} (station_id, time, count) VALUES #{values}")
+        statement = "INSERT INTO #{table} (station_id, time, count) VALUES #{values}"
+        begin
+          db.execute(statement)
+        rescue => e
+          puts statement
+          raise e
+        end
       end
       print '.'
     else
