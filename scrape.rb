@@ -43,42 +43,41 @@ stations['results'].each do |station|
   db.execute("INSERT INTO stations (id, status, latitude, longitude, label) VALUES (?, ?, ?, ?, ?)", station_row)
 
   name = station['label'].gsub(' ', '-')
-  ['available_bikes', 'available_docks'].each do |table|
     response = Faraday.get("http://data.citibik.es/render/") do |req|
-      req.params = {
-        format: 'json',
-        from: '-1weeks',
-        target: "#{name}.#{table}"
-      }
-    end
-    json = JSON.parse(response.body)[0]
-    if json
-      # sqlite doesnt seem to like adding too many values at once
-      json['datapoints'].each_slice(500).each do |datapoints|
-        values = datapoints.map { |datapoint|
-          value = [
-            station['id'],
-            datapoint[1],
-            datapoint[0]
-          ]
-          if value.any?(&:nil?)
-            nil
-          else
-            "(#{value.join(', ')})"
-          end
-        }.compact.join(', ')
+    req.params = {
+      format: 'json',
+      from: '-1weeks',
+      target: ["#{name}.available_bikes", "#{name}.available_docks"]
+    }
+  end
 
-        statement = "INSERT INTO #{table} (station_id, time, count) VALUES #{values}"
-        begin
-          db.execute(statement)
-        rescue => e
-          puts statement
-          raise e
+  # each target (metric)
+  JSON.parse(response.body).each do |json|
+    # sqlite doesnt seem to like adding too many values at once
+    json['datapoints'].each_slice(500).each do |datapoints|
+      values = datapoints.map { |datapoint|
+        value = [
+          station['id'],
+          datapoint[1],
+          datapoint[0]
+        ]
+        if value.any?(&:nil?)
+          nil
+        else
+          "(#{value.join(', ')})"
         end
+      }.compact.join(', ')
+
+      table = json['target'].split('.').last
+      statement = "INSERT INTO #{table} (station_id, time, count) VALUES #{values}"
+      begin
+        db.execute(statement)
+      rescue => e
+        puts statement
+        raise e
       end
-      print '.'
-    else
-      puts "\ncant find #{name}"
     end
   end
+
+  print '.'
 end
