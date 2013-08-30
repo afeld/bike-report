@@ -17,6 +17,8 @@ The data will then be loaded into a [SQLite3](http://www.sqlite.org/) database, 
 bundle exec ruby reports/REPORT_NAME.rb
 ```
 
+See all of them [here](reports/).
+
 ## Resources
 
 * https://github.com/noneck/CitiBike-OpenData-Law/wiki/CitiBike-NYC-Tools-and-Apps
