@@ -47,7 +47,7 @@ stations['results'].each do |station|
     response = Faraday.get("http://data.citibik.es/render/") do |req|
       req.params = {
         format: 'json',
-        from: '-2weeks',
+        from: '-1weeks',
         target: "#{name}.#{table}"
       }
     end
