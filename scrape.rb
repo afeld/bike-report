@@ -2,24 +2,29 @@ require 'citibikenyc'
 require 'faraday'
 require 'sqlite3'
 
+`rm -f data.db`
 db = SQLite3::Database.new('data.db')
 
 db.execute <<-SQL
-  create table IF NOT EXISTS stations (
-    citibike_id int,
+  create table stations (
+    id int,
     status varchar(30),
     latitude float,
     longitude float,
     label varchar(30)
   );
+SQL
 
-  create table IF NOT EXISTS available_bikes (
+db.execute <<-SQL
+  create table available_bikes (
     station_id int,
     time int,
     count int
   );
+SQL
 
-  create table IF NOT EXISTS available_docks (
+db.execute <<-SQL
+  create table available_docks (
     station_id int,
     time int,
     count int
@@ -28,19 +33,37 @@ SQL
 
 stations = Citibikenyc.stations
 stations['results'].each do |station|
-  data = [
+  station_row = [
     station['id'],
     station['status'],
     station['latitude'],
     station['longitude'],
     station['label']
   ]
-  db.execute("INSERT INTO stations (citibike_id, status, latitude, longitude, label) VALUES (?, ?, ?, ?, ?)", data)
-end
+  db.execute("INSERT INTO stations (id, status, latitude, longitude, label) VALUES (?, ?, ?, ?, ?)", station_row)
 
-# name = station['label'].gsub(' ', '-')
-# data = Faraday.get("http://data.citibik.es/render/?target=#{name}.available_bikes&format=json&from=-2weeks")
-# json = JSON.parse(data)
-# json['datapoints'].each do |datapoint|
-#   db.execute("INSERT INTO stations (citibike_id, status, latitude, longitude, label, address) VALUES (?, ?, ?, ?, ?, ?)", [data])
-# end
+  name = station['label'].gsub(' ', '-')
+  ['available_bikes', 'available_docks'].each do |table|
+    response = Faraday.get("http://data.citibik.es/render/") do |req|
+      req.params = {
+        format: 'json',
+        from: '-2weeks',
+        target: "#{name}.#{table}"
+      }
+    end
+    json = JSON.parse(response.body)[0]
+    if json
+      json['datapoints'].each do |datapoint|
+        availability_row = [
+          station['id'],
+          datapoint[1],
+          datapoint[0]
+        ]
+        db.execute("INSERT INTO #{table} (station_id, time, count) VALUES (?, ?, ?)", availability_row)
+      end
+      print '.'
+    else
+      puts "\ncant find #{name}"
+    end
+  end
+end
