@@ -36,6 +36,7 @@ SQL
 
 stations = Citibikenyc.stations
 stations['results'].each do |station|
+  # save the station
   station_row = [
     station['id'],
     station['status'],
@@ -45,8 +46,9 @@ stations['results'].each do |station|
   ]
   db.execute("INSERT INTO stations (id, status, latitude, longitude, label) VALUES (?, ?, ?, ?, ?)", station_row)
 
+  # get the metrics for the station
   name = station['label'].gsub(' ', '-')
-    response = Faraday.get("http://data.citibik.es/render/") do |req|
+  response = Faraday.get("http://data.citibik.es/render/") do |req|
     req.params = {
       format: 'json',
       from: '-1weeks',
@@ -64,6 +66,7 @@ stations['results'].each do |station|
           datapoint[1],
           datapoint[0]
         ]
+        # values are missing for some datapoints
         if value.any?(&:nil?)
           nil
         else
@@ -71,6 +74,7 @@ stations['results'].each do |station|
         end
       }.compact
 
+      # check if there's any data to be inserted
       unless values.empty?
         table = json['target'].split('.').last
         statement = "INSERT INTO #{table} (station_id, time, count) VALUES #{values.join(', ')}"
