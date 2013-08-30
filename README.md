@@ -17,6 +17,10 @@ The data will then be loaded into a [SQLite3](http://www.sqlite.org/) database, 
 bundle exec ruby reports/REPORT_NAME.rb
 ```
 
+For example (8/22/13-8/29/13):
+
+![Frequently Empty/Full Stations](frequently_empty_and_full.png)
+
 See all of them [here](reports/).
 
 ## Resources
