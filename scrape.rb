@@ -49,6 +49,7 @@ stations['results'].each do |station|
 
   # get the metrics for the station
   name = station['label'].gsub(' ', '-')
+  # http://graphite.readthedocs.org/en/latest/render_api.html
   response = Faraday.get("http://data.citibik.es/render/") do |req|
     req.params = {
       format: 'json',
