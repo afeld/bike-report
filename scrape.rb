@@ -1,6 +1,6 @@
-require 'citibikenyc'
-require 'faraday'
-require 'sqlite3'
+require 'rubygems'
+require 'bundler'
+Bundler.require(:default)
 
 `rm -f data.db`
 db = SQLite3::Database.new('data.db')
