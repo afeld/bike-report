@@ -25,6 +25,7 @@ See all of them [here](reports/).
 
 ## Resources
 
+* http://citibikenyc.com/system-data
 * https://github.com/noneck/CitiBike-OpenData-Law/wiki/CitiBike-NYC-Tools-and-Apps
 * https://github.com/edgar/citibikenyc
 * http://appservices.citibikenyc.com/data2/stations.php
