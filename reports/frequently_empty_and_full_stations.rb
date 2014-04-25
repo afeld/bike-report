@@ -2,14 +2,19 @@ require 'rubygems'
 require 'bundler'
 Bundler.setup(:default)
 
+require 'csv'
 require 'sqlite3'
 
 @db = SQLite3::Database.new('data.db')
 
 def print_rows(rows)
-  rows.each do |row|
-    puts "#{row[0].ljust(30)}#{row[1].round(1)}%"
+  csv_string = CSV.generate do |csv|
+    rows.each do |row|
+      csv << [row[0], row[1].round(1)]
+    end
   end
+
+  puts csv_string
 end
 
 # thanks to https://twitter.com/Bipsterite for the original query
