@@ -7,19 +7,17 @@ require 'sqlite3'
 
 @db = SQLite3::Database.new('data.db')
 
-def print_rows(rows)
-  csv_string = CSV.generate do |csv|
+def print_rows(name, rows)
+  CSV.open("#{name}.csv", 'wb') do |csv|
     rows.each do |row|
       csv << [row[0], row[1].round(1)]
     end
   end
-
-  puts csv_string
 end
 
 # thanks to https://twitter.com/Bipsterite for the original query
 
-def run_query(under_threshold_sql)
+def run_query(name, under_threshold_sql)
   rows = @db.execute <<-SQL
     SELECT stations.label, (under_threshold_location.count * 100.0 / total_location.count) AS frequency
     FROM (
@@ -33,7 +31,7 @@ def run_query(under_threshold_sql)
     INNER JOIN stations ON stations.id = under_threshold_location.station_id
     WHERE stations.status = "In Service";
   SQL
-  print_rows(rows)
+  print_rows(name, rows)
 end
 
 def frequently_empty
@@ -43,7 +41,7 @@ def frequently_empty
     WHERE count < 2
     GROUP BY station_id
   SQL
-  run_query(subquery)
+  run_query('empty_frequency', subquery)
 end
 
 def frequently_full
@@ -56,11 +54,8 @@ def frequently_full
     WHERE (stations.total_docks - available_bikes.count) < 2
     GROUP BY station_id
   SQL
-  run_query(subquery)
+  run_query('full_frequency', subquery)
 end
 
-puts "FREQUENTLY EMPTY STATIONS (PERCENT OF RECORDED TIMES)"
 frequently_empty
-
-puts "\nFREQUENTLY FULL STATIONS (PERCENT OF RECORDED TIMES)"
 frequently_full
