@@ -36,3 +36,7 @@ See all of them [here](reports/).
 * https://github.com/edgar/citibikenyc
 * http://appservices.citibikenyc.com/data2/stations.php
 * http://data.citibik.es/
+
+## Thanks
+
+Special thanks to [HowAboutWe](http://www.howaboutwe.com/) for sponsoring a refresh of the work.
