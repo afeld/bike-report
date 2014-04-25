@@ -2,7 +2,7 @@ require 'rubygems'
 require 'bundler'
 Bundler.setup(:default)
 
-require 'citibikenyc'
+require 'json'
 require 'faraday'
 require 'sqlite3'
 
@@ -17,6 +17,7 @@ db.execute_batch <<-SQL
   CREATE TABLE stations (
     id INTEGER PRIMARY KEY,
     status VARCHAR(30),
+    total_docks INTEGER,
     latitude FLOAT,
     longitude FLOAT,
     label VARCHAR(30) NOT NULL
@@ -27,34 +28,32 @@ db.execute_batch <<-SQL
     time INTEGER NOT NULL,
     count INTEGER NOT NULL
   );
-
-  CREATE TABLE available_docks (
-    station_id INTEGER NOT NULL,
-    time INTEGER NOT NULL,
-    count INTEGER NOT NULL
-  );
 SQL
 
-stations = Citibikenyc.stations
-stations['results'].each do |station|
+# http://citibikenyc.com/system-data
+response = Faraday.get('http://citibikenyc.com/stations/json')
+stations = JSON.parse(response.body)['stationBeanList']
+
+stations.each do |station|
   # save the station
   station_row = [
     station['id'],
-    station['status'],
+    station['statusValue'],
+    station['totalDocks'],
     station['latitude'],
     station['longitude'],
-    station['label']
+    station['stationName']
   ]
-  db.execute("INSERT INTO stations (id, status, latitude, longitude, label) VALUES (?, ?, ?, ?, ?)", station_row)
+  db.execute("INSERT INTO stations (id, status, total_docks, latitude, longitude, label) VALUES (?, ?, ?, ?, ?, ?)", station_row)
 
   # get the metrics for the station
-  name = station['label'].gsub(' ', '-')
+  name = station['stationName'].gsub(' ', '-')
   # http://graphite.readthedocs.org/en/latest/render_api.html
   response = Faraday.get("http://data.citibik.es/render/") do |req|
     req.params = {
       format: 'json',
       from: '-1weeks',
-      target: ["#{name}.available_bikes", "#{name}.available_docks"]
+      target: ["#{name}.available_bikes"]
     }
   end
 
