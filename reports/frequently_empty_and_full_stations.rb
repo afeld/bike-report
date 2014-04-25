@@ -31,9 +31,7 @@ def run_query(under_threshold_sql)
     INNER JOIN (#{under_threshold_sql}) AS under_threshold_location
     ON total_location.station_id = under_threshold_location.station_id
     INNER JOIN stations ON stations.id = under_threshold_location.station_id
-    WHERE stations.status = "In Service"
-    ORDER BY frequency DESC
-    LIMIT 10;
+    WHERE stations.status = "In Service";
   SQL
   print_rows(rows)
 end
