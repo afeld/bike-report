@@ -6,14 +6,14 @@ GEM
       faraday_middleware (~> 0.9.0)
       hashie (~> 2.0.5)
       multi_json (~> 1.7.7)
-    faraday (0.8.8)
+    faraday (0.8.9)
       multipart-post (~> 1.2.0)
-    faraday_middleware (0.9.0)
-      faraday (>= 0.7.4, < 0.9)
+    faraday_middleware (0.9.1)
+      faraday (>= 0.7.4, < 0.10)
     hashie (2.0.5)
     multi_json (1.7.9)
     multipart-post (1.2.0)
-    sqlite3 (1.3.8)
+    sqlite3 (1.3.9)
 
 PLATFORMS
   ruby
