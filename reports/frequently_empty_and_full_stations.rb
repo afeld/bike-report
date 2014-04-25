@@ -10,7 +10,7 @@ require 'sqlite3'
 def print_rows(name, rows)
   CSV.open("#{name}.csv", 'wb') do |csv|
     rows.each do |row|
-      csv << [row[0], row[1].round(1)]
+      csv << row
     end
   end
 end
@@ -19,7 +19,7 @@ end
 
 def run_query(name, under_threshold_sql)
   rows = @db.execute <<-SQL
-    SELECT stations.label, (under_threshold_location.count * 100.0 / total_location.count) AS frequency
+    SELECT stations.label, (under_threshold_location.count * 1.0 / total_location.count) AS frequency
     FROM (
       -- total data points
       SELECT station_id, COUNT(*) AS count
