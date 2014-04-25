@@ -19,16 +19,23 @@ end
 
 def run_query(name, under_threshold_sql)
   rows = @db.execute <<-SQL
-    SELECT stations.label, (under_threshold_location.count * 1.0 / total_location.count) AS frequency
+    SELECT
+      stations.label,
+      stations.latitude,
+      stations.longitude,
+      (under_threshold_location.count * 1.0 / total_location.count) AS frequency
     FROM (
       -- total data points
-      SELECT station_id, COUNT(*) AS count
+      SELECT
+        station_id,
+        COUNT(*) AS count
       FROM available_bikes
       GROUP BY station_id
     ) AS total_location
     INNER JOIN (#{under_threshold_sql}) AS under_threshold_location
     ON total_location.station_id = under_threshold_location.station_id
-    INNER JOIN stations ON stations.id = under_threshold_location.station_id
+    INNER JOIN stations
+    ON stations.id = under_threshold_location.station_id
     WHERE stations.status = "In Service";
   SQL
   print_rows(name, rows)
