@@ -15,7 +15,6 @@ end
 # thanks to https://twitter.com/Bipsterite for the original query
 
 def run_query(under_threshold_sql)
-  # TODO limit to in-service stations
   rows = @db.execute <<-SQL
     SELECT stations.label, (under_threshold_location.count * 100.0 / total_location.count) AS frequency
     FROM (
@@ -27,6 +26,7 @@ def run_query(under_threshold_sql)
     INNER JOIN (#{under_threshold_sql}) AS under_threshold_location
     ON total_location.station_id = under_threshold_location.station_id
     INNER JOIN stations ON stations.id = under_threshold_location.station_id
+    WHERE stations.status = "In Service"
     ORDER BY frequency DESC
     LIMIT 10;
   SQL
