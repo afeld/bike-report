@@ -1,6 +1,9 @@
 # NYC CitiBike Reporting
 
-Downloads historical data for CitiBike stations, and comes with a set of scripts that can be run to generate various reports.
+Downloads historical data for CitiBike stations, and comes with a set of scripts that can be run to generate various reports.  Write-ups:
+
+* http://afeld.me/nerdery/1515624
+* http://www.nerve.com/infographics/most-popular-least-popular-citibike-stations-new-york-city
 
 ## Non-technical walkthrough
 
